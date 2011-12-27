@@ -25,37 +25,37 @@ endfunction
 
 
 function! FoldCCnavi() "{{{
-if foldlevel('.')
-  let save_csr=winsaveview()
-  let parentList=[]
+  if foldlevel('.')
+    let save_csr=winsaveview()
+    let parentList=[]
 
-  "カーソル行が折り畳まれているとき"{{{
-  let whtrClosed = foldclosed('.')
-  if whtrClosed !=-1
-    call insert(parentList, s:surgery_line(whtrClosed) )
-    if foldlevel('.') == 1
-      call winrestview(save_csr)
-      return join(parentList,' > ')
-    endif
+    "カーソル行が折り畳まれているとき"{{{
+    let whtrClosed = foldclosed('.')
+    if whtrClosed !=-1
+      call insert(parentList, s:surgery_line(whtrClosed) )
+      if foldlevel('.') == 1
+        call winrestview(save_csr)
+        return join(parentList,' > ')
+      endif
 
-    normal! [z
-    if foldclosed('.') ==whtrClosed
-      call winrestview(save_csr)
-      return join(parentList,' > ')
-    endif
-  endif"}}}
+      normal! [z
+      if foldclosed('.') ==whtrClosed
+        call winrestview(save_csr)
+        return join(parentList,' > ')
+      endif
+    endif"}}}
 
-  "折畳を再帰的に戻れるとき"{{{
-  while 1
-    normal! [z
-    call insert(parentList, s:surgery_line('.') )
-    if foldlevel('.') == 1
-      break
-    endif
-  endwhile
-  call winrestview(save_csr)
-  return join(parentList,' > ')"}}}
-endif
+    "折畳を再帰的に戻れるとき"{{{
+    while 1
+      normal! [z
+      call insert(parentList, s:surgery_line('.') )
+      if foldlevel('.') == 1
+        break
+      endif
+    endwhile
+    call winrestview(save_csr)
+    return join(parentList,' > ')"}}}
+  endif
 endfunction
 "}}}
 
