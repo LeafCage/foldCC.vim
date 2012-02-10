@@ -39,13 +39,13 @@ function! FoldCCnavi() "{{{
       call insert(parentList, s:surgery_line(whtrClosed) )
       if foldlevel('.') == 1
         call winrestview(save_csr)
-        return join(parentList,' > ')
+        return join(parentList,' >> ')
       endif
 
       normal! [z
       if foldclosed('.') ==whtrClosed
         call winrestview(save_csr)
-        return join(parentList,' > ')
+        return join(parentList,' >> ')
       endif
     endif"}}}
 
@@ -58,7 +58,7 @@ function! FoldCCnavi() "{{{
       endif
     endwhile
     call winrestview(save_csr)
-    return join(parentList,' > ')"}}}
+    return join(parentList,' >> ')"}}}
 
   else
     "折り畳みの中にいないとき
