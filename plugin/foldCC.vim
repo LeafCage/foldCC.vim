@@ -84,7 +84,8 @@ function! s:rm_CmtAndFmr(lnum)"{{{
   endif
   let foldmarkers = split(&foldmarker, ',')
 
-  return substitute(line,'\V\%('.comment[0].'\)\?\s\*'.foldmarkers[0].'\%(\d\+\)\?\s\*\%('.comment_end.'\)\?', '','')
+  let line = substitute(line,'\V\%('.comment[0].'\)\?\s\*'.foldmarkers[0].'\%(\d\+\)\?\s\*\%('.comment_end.'\)\?', '','')
+  return line
 endfunction"}}}
 
 
