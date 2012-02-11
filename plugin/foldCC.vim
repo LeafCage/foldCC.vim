@@ -27,6 +27,12 @@ endfunction
 "}}}
 
 
+"g:foldCCnavi_shorten 折畳表示が長すぎるときこの値で切り詰め（規定:60）
+if !exists('g:foldCCnavi_shorten')
+  let g:foldCCnavi_shorten = 60
+endif
+
+
 function! FoldCCnavi() "{{{
   "wrk; 現在行の折り畳みナビゲート文字列を返す
   if foldlevel('.')
@@ -74,9 +80,10 @@ function! s:rm_CmtAndFmr(lnum)"{{{
   let line = getline(a:lnum)
 
   let comment = split(&commentstring, '%s')
-  if &commentstring =~? '^%s'
+  if &commentstring =~? '^%s' "コメント文字が定義されてない時の対応
     call insert(comment,'')
   endif
+  let comment[0] = substitute(comment[0],'\s','','g') "コメント文字に空白文字が含まれているときの対応
 
   let comment_end =''
   if len(comment) > 1
@@ -93,7 +100,7 @@ function! s:surgery_line(lnum)"{{{
   "wrk; a:lnum行目の内容を得て、マルチバイトも考慮しながら切り詰めを行ったものを返す
   let line = substitute(s:rm_CmtAndFmr(a:lnum),'\V\s','','g')
   let regardMultibyte = len(line) - strdisplaywidth(line)
-  let alignment = 60 + regardMultibyte
+  let alignment = g:foldCCnavi_shorten + regardMultibyte
   return line[:alignment]
 endfunction"}}}
 
