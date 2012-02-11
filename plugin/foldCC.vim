@@ -1,3 +1,14 @@
+"g:foldCCtext_shorten foldtextが長すぎるときこの値に切り詰め（規定:77）
+if !exists('g:foldCCtext_shorten')
+  let g:foldCCtext_shorten = 77
+endif
+
+"g:foldCCnavi_shorten 折畳表示が長すぎるときこの値で切り詰め（規定:60）
+if !exists('g:foldCCnavi_shorten')
+  let g:foldCCnavi_shorten = 60
+endif
+
+
 "折り畳み関数"{{{
 function! FoldCCtext()
   "rol; set foldtext=FoldCCtext()に設定して折り畳んだときのテキスト生成
@@ -13,8 +24,8 @@ function! FoldCCtext()
       let line_width -= max([&numberwidth, len(line('$'))])
   endif
 
-  if line_width >77
-    let line_width =77
+  if line_width > g:foldCCtext_shorten
+    let line_width = g:foldCCtext_shorten
   endif
   let alignment = line_width - 15 - 4 + regardMultibyte
     "15はprintf()で消費する分、4はfolddasesを使うための余白
@@ -25,12 +36,6 @@ function! FoldCCtext()
   return printf('%-'.alignment.'.'.alignment.'s   [%4d  Lv%-2d]%s', line,v:foldend-v:foldstart+1,v:foldlevel,v:folddashes)
 endfunction
 "}}}
-
-
-"g:foldCCnavi_shorten 折畳表示が長すぎるときこの値で切り詰め（規定:60）
-if !exists('g:foldCCnavi_shorten')
-  let g:foldCCnavi_shorten = 60
-endif
 
 
 function! FoldCCnavi() "{{{
