@@ -62,26 +62,32 @@ function! FoldCCnavi() "{{{
       call insert(parentList, s:surgery_line(whtrClosed) )
       if foldlevel('.') == 1
         call winrestview(save_csr)
-        return join(parentList,' >> ')
+        return join(parentList,' > ')
       endif
 
       normal! [z
       if foldclosed('.') ==whtrClosed
         call winrestview(save_csr)
-        return join(parentList,' >> ')
+        return join(parentList,' > ')
       endif
     endif"}}}
 
     "折畳を再帰的に戻れるとき"{{{
+    let geted_linenr = 0
     while 1
       normal! [z
+      if geted_linenr == line('.') "同一行にFoldingMarkerが重なってると無限ループになる問題の暫定的解消
+        break
+      endif
+
       call insert(parentList, s:surgery_line('.') )
       if foldlevel('.') == 1
         break
       endif
+      let geted_linenr = line('.')
     endwhile
     call winrestview(save_csr)
-    return join(parentList,' >> ')"}}}
+    return join(parentList,' > ')"}}}
 
   else
     "折り畳みの中にいないとき
