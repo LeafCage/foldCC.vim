@@ -1,24 +1,27 @@
+
+"各種変数 "{{{
 "g:foldCCtext_shorten foldtextが長すぎるときこの値に切り詰め（規定:77）
 if !exists('g:foldCCtext_shorten')
   let g:foldCCtext_shorten = 77
 endif
 
-"g:foldCCtext_printf foldtextの後ろに表示される内容（規定:'   [%4d lines  Lv%-2d]'）
+"g:foldCCtext_printf foldtextの後ろに表示される内容（規定:'[%4d lines  Lv%-2d]'）
 if !exists('g:foldCCtext_printf')
-  let g:foldCCtext_printf = '   [%4d lines  Lv%-2d]'
+  let g:foldCCtext_printf = '[%4d lines  Lv%-2d]'
 endif
 
 "g:foldCCtext_printf_strlen g:foldCCtext_printfで表示される文字数（規定:21）
 " g:foldCCtext_printfを変更したときには数え直して変更してください
 " 将来スクリプトローカル化して自動で数えるようにしたいなぁ（願望）
 if !exists('g:foldCCtext_printf_strlen')
-  let g:foldCCtext_printf_strlen = 21
+  let g:foldCCtext_printf_strlen = 18
 endif
 
 "g:foldCCnavi_shorten 折畳表示が長すぎるときこの値で切り詰め（規定:60）
 if !exists('g:foldCCnavi_shorten')
   let g:foldCCnavi_shorten = 60
 endif
+ "}}}
 
 
 "折り畳み関数"{{{
@@ -40,12 +43,13 @@ function! FoldCCtext()
     let line_width = g:foldCCtext_shorten
   endif
 
-  let alignment = line_width - g:foldCCtext_printf_strlen - 4 + regardMultibyte
-    "g:foldCCtext_printf_strlenはprintf()で消費する分、4はfolddasesを使うための余白
+  let alignment = line_width - g:foldCCtext_printf_strlen+3 - 6 + regardMultibyte
+    "g:foldCCtext_printf_strlenはprintf()で消費する分、3はつなぎの空白文字、6はfolddasesを使うための余白
     "issue:regardMultibyteで足される分が多い （61桁をオーバーして切り詰められてる場合
   "}}} obt; alignment
 
-  return printf('%-'.alignment.'.'.alignment.'s'.g:foldCCtext_printf.'%s', line,v:foldend-v:foldstart+1,v:foldlevel,v:folddashes)
+  return printf('%-'.alignment.'.'.alignment.'s   %s'.    g:foldCCtext_printf.    '%s',
+        \ line,v:folddashes,    v:foldend-v:foldstart+1,v:foldlevel,    v:folddashes)
 endfunction
 "}}}
 
