@@ -48,7 +48,9 @@ function! FoldCCtext()
     "issue:regardMultibyteで足される分が多い （61桁をオーバーして切り詰められてる場合
   "}}} obt; alignment
 
-  return printf('%-'.alignment.'.'.alignment.'s   %s'.    g:foldCCtext_printf.    '%s',
+  let line = s:arrange_multibyte_str(line[:arignment-1])
+
+  return printf('%-'.alignment.'s   %s'.    g:foldCCtext_printf.    '%s',
         \ line,v:folddashes,    v:foldend-v:foldstart+1,v:foldlevel,    v:folddashes)
 endfunction
 "}}}
@@ -60,21 +62,21 @@ function! FoldCCnavi() "{{{
     let save_csr=winsaveview()
     let parentList=[]
 
+    let ClosedFolding_firstline = foldclosed('.')
     "カーソル行が折り畳まれているとき"{{{
-    let whtrClosed = foldclosed('.')
-    if whtrClosed !=-1
-      call insert(parentList, s:surgery_line(whtrClosed) )
+    if ClosedFolding_firstline != -1
+      call insert(parentList, s:surgery_line(ClosedFolding_firstline) )
       if foldlevel('.') == 1
         call winrestview(save_csr)
         return join(parentList,' > ')
       endif
 
       normal! [z
-      if foldclosed('.') ==whtrClosed
+      if foldclosed('.') ==ClosedFolding_firstline
         call winrestview(save_csr)
         return join(parentList,' > ')
       endif
-    endif"}}}
+    endif "}}}
 
     "折畳を再帰的に戻れるとき"{{{
     let geted_linenr = 0
@@ -91,7 +93,7 @@ function! FoldCCnavi() "{{{
       let geted_linenr = line('.')
     endwhile
     call winrestview(save_csr)
-    return join(parentList,' > ')"}}}
+    return join(parentList,' > ') "}}}
 
   else
     "折り畳みの中にいないとき
@@ -101,7 +103,7 @@ endfunction
 "}}}
 
 
-function! s:rm_CmtAndFmr(lnum)"{{{
+function! s:rm_CmtAndFmr(lnum) "{{{
   "wrk; a:lnum行目の文字列を取得し、そこからcommentstringとfoldmarkersを除いたものを返す
   "rol; 折り畳みマーカー（とそれを囲むコメント文字）を除いた純粋な行の内容を得る
   let line = getline(a:lnum)
@@ -120,15 +122,21 @@ function! s:rm_CmtAndFmr(lnum)"{{{
 
   let line = substitute(line,'\V\%('.comment[0].'\)\?\s\*'.foldmarkers[0].'\%(\d\+\)\?\s\*\%('.comment_end.'\)\?', '','')
   return line
-endfunction"}}}
+endfunction "}}}
 
 
-function! s:surgery_line(lnum)"{{{
+function! s:surgery_line(lnum) "{{{
   "wrk; a:lnum行目の内容を得て、マルチバイトも考慮しながら切り詰めを行ったものを返す
   let line = substitute(s:rm_CmtAndFmr(a:lnum),'\V\s','','g')
   let regardMultibyte = len(line) - strdisplaywidth(line)
   let alignment = g:foldCCnavi_shorten + regardMultibyte
-  return line[:alignment]
-endfunction"}}}
+  return s:arrange_multibyte_str(line[:alignment])
+endfunction "}}}
+
+
+"マルチバイト文字が途中で切れると発生する<83><BE>などの文字を除外させる
+function! s:arrange_multibyte_str(str) "{{{
+  return substitute(strtrans(a:str), '<\x\x>','','g')
+endfunction "}}}
 
 
