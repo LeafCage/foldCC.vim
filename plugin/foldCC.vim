@@ -48,10 +48,10 @@ function! FoldCCtext()
     "issue:regardMultibyteで足される分が多い （61桁をオーバーして切り詰められてる場合
   "}}} obt; alignment
 
-  let line = s:arrange_multibyte_str(line[:arignment-1])
+  let line = s:arrange_multibyte_str(printf('%-'.alignment.'.'.alignment.'s',line))
 
-  return printf('%-'.alignment.'s   %s'.    g:foldCCtext_printf.    '%s',
-        \ line,v:folddashes,    v:foldend-v:foldstart+1,v:foldlevel,    v:folddashes)
+  return printf('%s   %s'.    g:foldCCtext_printf.    '%s',
+        \ line, v:folddashes,    v:foldend-v:foldstart+1, v:foldlevel,    v:folddashes)
 endfunction
 "}}}
 
