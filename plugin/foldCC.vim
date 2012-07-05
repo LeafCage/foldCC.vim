@@ -1,3 +1,30 @@
+"au CursorHold * call MovedCC()
+function! MovedCC()
+  hi FoldTop gui=bold guibg=DarkBlue guifg=Red
+  exe 'sy match FoldTop /\%'.v:foldstart.'l^./'
+  hi FoldTop gui=bold guibg=DarkBlue guifg=Red
+  exe 'sy match FoldTop /\%'.v:foldstart.'l.*/'
+  exe 'sy match FoldTop /\%'.v:foldend.'l.*/'
+  echo v:foldstart v:foldstart
+endfunction
+
+"au BufRead,BufNew * syn match FoldMarkerStart /{{{/ containedin=ALL "}}}
+"au CursorHold * call Syntax_foldtop()
+"au InsertEnter,InsertLeave,CmdwinEnter,FileType,BufWinEnter,BufHidden,BufWrite * call Syntax_foldtop()
+
+"syn match FoldMarkerStart /{{{/ containedin=ALL "}}}
+"hi FoldMarkerStart gui=bold guibg=LightRed guifg=LightBlue
+
+
+function! Syntax_foldtop()
+  if !exists('b:foldstarts')
+    return
+  endif
+  hi FoldTop gui=bold guibg=DarkBlue guifg=Red
+  for picked in b:foldstarts
+    exe 'sy match FoldTop /^\%'.picked.'l\s*../'
+  endfor
+endfunction
 
 "各種変数 "{{{
 "g:foldCCtext_shorten foldtextが長すぎるときこの値に切り詰め（規定:77）
@@ -29,10 +56,10 @@ function! FoldCCtext()
   "rol; set foldtext=FoldCCtext()に設定して折り畳んだときのテキスト生成
 
   "表示するテキストの作成（折り畳みマーカーを除去）
-  let line = s:rm_CmtAndFmr(v:foldstart)
+  let linestr = s:rm_CmtAndFmr(v:foldstart)
 
   "切り詰めサイズをウィンドウに合わせる"{{{
-  let regardMultibyte =strlen(line) -strdisplaywidth(line)
+  let regardMultibyte =strlen(linestr) -strdisplaywidth(linestr)
 
   let line_width = winwidth(0) - &foldcolumn
   if &number == 1 "行番号表示オンのとき
@@ -48,12 +75,47 @@ function! FoldCCtext()
     "issue:regardMultibyteで足される分が多い （61桁をオーバーして切り詰められてる場合
   "}}} obt; alignment
 
-  let line = s:arrange_multibyte_str(printf('%-'.alignment.'.'.alignment.'s',line))
+
+  "foldstartを強調表示させる（未完成）"{{{
+"  if index(b:foldstarts, v:foldstart) == -1
+"    call add(b:foldstarts, v:foldstart)
+"  endif
+"  "折り畳み行がずれたとき（気休め）
+"  for picked in b:foldstarts
+"    if picked +1 == v:foldstart || picked -1 == v:foldstart || foldlevel(picked) == 0
+"      call remove(b:foldstarts, index(picked))
+"    endif
+"  endfor "}}}
+
+  "redraw "タブページにFoldCCnaviを表示させているとき、カーソルの動きに合わせてリアルタイムに情報更新させる
+
+  let linestr = s:arrange_multibyte_str(printf('%-'.alignment.'.'.alignment.'s', linestr))
+  let linestr = substitute(linestr, '^\s*', '\0'.(v:foldlevel == 1 ? '' : v:folddashes), '')
 
   return printf('%s   %s'.    g:foldCCtext_printf.    '%s',
-        \ line, v:folddashes,    v:foldend-v:foldstart+1, v:foldlevel,    v:folddashes)
+        \ linestr, v:folddashes,    v:foldend-v:foldstart+1, v:foldlevel,    v:folddashes)
 endfunction
 "}}}
+
+
+function! s:picklist(list) "{{{
+  "バッファ・ウィンドウを移ったときリセット
+  let [stt,end] = [line('w0'),line('w$')]
+  let list = a:list
+  let cutedlist = []
+  let oldpicked = 0
+  for picked in list
+    if picked < oldpicked
+      call remove(list, index(list, picked))
+      continue
+    endif
+    let oldpicked = picked
+    "if picked <= end && picked >= stt
+    "  call add(cutedlist,picked)
+    "endif
+  endfor
+  return list
+endfunction "}}}
 
 
 function! FoldCCnavi() "{{{
@@ -106,7 +168,7 @@ endfunction
 function! s:rm_CmtAndFmr(lnum) "{{{
   "wrk; a:lnum行目の文字列を取得し、そこからcommentstringとfoldmarkersを除いたものを返す
   "rol; 折り畳みマーカー（とそれを囲むコメント文字）を除いた純粋な行の内容を得る
-  let line = getline(a:lnum)
+  let linestr = getline(a:lnum)
 
   let comment = split(&commentstring, '%s')
   if &commentstring =~? '^%s' "コメント文字が定義されてない時の対応
@@ -120,8 +182,8 @@ function! s:rm_CmtAndFmr(lnum) "{{{
   endif
   let foldmarkers = split(&foldmarker, ',')
 
-  let line = substitute(line,'\V\%('.comment[0].'\)\?\s\*'.foldmarkers[0].'\%(\d\+\)\?\s\*\%('.comment_end.'\)\?', '','')
-  return line
+  let linestr = substitute(linestr,'\V\%('.comment[0].'\)\?\s\*'.foldmarkers[0].'\%(\d\+\)\?\s\*\%('.comment_end.'\)\?', '','')
+  return linestr
 endfunction "}}}
 
 
@@ -131,6 +193,7 @@ function! s:surgery_line(lnum) "{{{
   let regardMultibyte = len(line) - strdisplaywidth(line)
   let alignment = g:foldCCnavi_shorten + regardMultibyte
   return s:arrange_multibyte_str(line[:alignment])
+  "return s:arrange_multibyte_str(printf('%.'.alignment.'s', line) ) "違いは長い折り畳みの時末尾が表示されるか中央部が表示されるか
 endfunction "}}}
 
 
@@ -138,5 +201,8 @@ endfunction "}}}
 function! s:arrange_multibyte_str(str) "{{{
   return substitute(strtrans(a:str), '<\x\x>','','g')
 endfunction "}}}
+
+
+
 
 
