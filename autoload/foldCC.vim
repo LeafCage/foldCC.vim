@@ -23,18 +23,14 @@ endfunction "}}}
 
 "=============================================================================
 function! foldCC#ret_navilist() "{{{
-  if !foldlevel('.') "折り畳みにいない
-    return ''
-  endif
-  let save_view = winsaveview()
   let foldheads = []
-
-  if s:__cv_add_crrfoldhead(foldheads)
-    call winrestview(save_view)
+  if !foldlevel('.') "折り畳みにいない
     return foldheads
   endif
+  let save_view = winsaveview()
 
-  if mode() =~ '[sS]' "FIXME:selectmodeでnormal!コマンドを使うとE523が出る問題の暫定的解消
+  if s:__cv_add_crr_closedfoldhead(foldheads)
+    call winrestview(save_view)
     return foldheads
   endif
 
@@ -45,7 +41,7 @@ function! foldCC#ret_navilist() "{{{
 endfunction
 "}}}
 
-function! s:__cv_add_crrfoldhead(foldheads) "{{{
+function! s:__cv_add_crr_closedfoldhead(foldheads) "{{{
   let foldc_num = foldclosed('.')
   if foldc_num == -1
     return 0
@@ -56,6 +52,7 @@ function! s:__cv_add_crrfoldhead(foldheads) "{{{
     return 1
   endif
 
+  "閉じた折り畳みの中の、途中の行にいた場合
   normal! [z
   if foldclosed('.') == foldc_num
     return 1
@@ -63,18 +60,25 @@ function! s:__cv_add_crrfoldhead(foldheads) "{{{
 endfunction
 "}}}
 function! s:__cv_collect_foldheads(foldheads) "{{{
+  if mode() =~ '[sS]' "FIXME:selectmodeでnormal!コマンドを使うとE523が出る問題の暫定的解消
+    return
+  endif
+
   "折畳を再帰的に戻れるとき
   let i = 0
   try
-  while foldlevel('.') > 1
-    normal! [z
-    if i == line('.') "FIXME:同一行にFoldingMarkerが重なってると無限ループになる問題の暫定的解消
-      break
-    endif
+    while 1
+      normal! [z
+      if i == line('.') "FIXME:同一行にFoldingMarkerが重なってると無限ループになる問題の暫定的解消
+        break
+      endif
 
-    call insert(a:foldheads, s:___surgery_line(getline('.')))
-    let i = line('.')
-  endwhile
+      call insert(a:foldheads, s:___surgery_line(getline('.')))
+      if foldlevel('.') == 1
+        break
+      endif
+      let i = line('.')
+    endwhile
   catch
     ec 'foldCCnavi: 何かしらのエラーが起こりました g:foldCC_err参照'
     let g:foldCC_err = v:exception
@@ -84,7 +88,7 @@ endfunction
 
 function! s:___surgery_line(str) "{{{
   let foldhead = foldCC#__remove_commentstring_and_foldmarkers(a:str)
-  let foldhead = substitute(foldhead,'\V\s','','g') "空白除去
+  let foldhead = substitute(substitute(foldhead, '^\s*\|\s$', '', 'g'), '\s\+', ' ', 'g')
 
   let multibyte_width_diff = len(foldhead) - strdisplaywidth(foldhead)
   let truncate_num = g:foldCCnavi_maxchars + multibyte_width_diff

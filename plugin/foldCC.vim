@@ -6,9 +6,9 @@ let s:VLSt = s:V.import('Lclib.String')
 "=============================================================================
 "Variables
 
-"foldheadが長すぎるときこの値に切り詰め（既定:77）
+"foldheadが長すぎるときこの値に切り詰め（既定:78）
 let g:foldCCtext_maxchars =
-  \ exists('g:foldCCtext_maxchars') ? g:foldCCtext_maxchars : 80
+  \ exists('g:foldCCtext_maxchars') ? g:foldCCtext_maxchars : 78
 
 
 "foldtextの前に表示される内容
@@ -25,10 +25,10 @@ let g:foldCCtext_tail =
   \ ' v:folddashes, v:foldend-v:foldstart+1, v:foldlevel, v:folddashes)'
 
 
-
 "折畳表示が長すぎるときこの値で切り詰め（既定:60）
 let g:foldCCnavi_maxchars =
   \ exists('g:foldCCnavi_maxchars') ? g:foldCCnavi_maxchars : 60
+
 
 
 
@@ -36,8 +36,8 @@ let g:foldCCnavi_maxchars =
 "USAGE: :set foldtext=FoldCCtext()
 function! FoldCCtext() "{{{
   let foldhead = foldCC#__remove_commentstring_and_foldmarkers(getline(v:foldstart))
-  let head = eval(g:foldCCtext_head)
-  let tail = eval(g:foldCCtext_tail)
+  let head = g:foldCCtext_head == '' ? '' : eval(g:foldCCtext_head)
+  let tail = g:foldCCtext_tail == '' ? '' : eval(g:foldCCtext_tail)
 
   let truncate_num = s:__get_truncate_num(foldhead, head, tail)
   let foldhead = printf('%-'. truncate_num. '.'. truncate_num. 's', foldhead)
