@@ -6,18 +6,18 @@ let s:VLSt = s:V.import('Lclib.String')
 "=============================================================================
 "Variables
 
-"foldheadが長すぎるときこの値に切り詰め（既定:78）
+"foldtextが長すぎるときこの値に切り詰め（既定:78）
 let g:foldCCtext_maxchars =
   \ exists('g:foldCCtext_maxchars') ? g:foldCCtext_maxchars : 78
 
 
-"foldtextの前に表示される内容
+"foldheadの前に表示される内容
 "評価されるので文字列を指定したい場合は'"文字列"'という形などにする
 let g:foldCCtext_head =
   \ exists('g:foldCCtext_head') ? g:foldCCtext_head : 'v:folddashes'
 
 
-"foldtextの後ろに表示される内容
+"foldheadの後ろに表示される内容
 "評価されるので文字列を指定したい場合は'"文字列"'という形などにする
 let g:foldCCtext_tail =
   \ exists('g:foldCCtext_tail') ? g:foldCCtext_tail :
