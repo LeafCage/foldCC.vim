@@ -53,7 +53,7 @@ function! s:__cv_add_crr_closedfoldhead(foldheads) "{{{
   endif
 
   "閉じた折り畳みの中の、途中の行にいた場合
-  normal! [z
+  keepj normal! [z
   if foldclosed('.') == foldc_num
     return 1
   endif
@@ -68,7 +68,7 @@ function! s:__cv_collect_foldheads(foldheads) "{{{
   let i = 0
   try
     while 1
-      normal! [z
+      keepj normal! [z
       if i == line('.') "FIXME:同一行にFoldingMarkerが重なってると無限ループになる問題の暫定的解消
         break
       endif

@@ -1,28 +1,33 @@
 let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
 let s:V = vital#of('foldCC')
-let s:VLSt = s:V.import('Lclib.String')
+let s:LSt = s:V.import('Lclib.String')
 
 "=============================================================================
 "Variables
 
-"foldheadが長すぎるときこの値に切り詰め（既定:78）
+"foldtextが長すぎるときこの値に切り詰め（既定:78）
 let g:foldCCtext_maxchars =
   \ exists('g:foldCCtext_maxchars') ? g:foldCCtext_maxchars : 78
 
 
-"foldtextの前に表示される内容
+"foldheadの前に表示される内容
 "評価されるので文字列を指定したい場合は'"文字列"'という形などにする
 let g:foldCCtext_head =
   \ exists('g:foldCCtext_head') ? g:foldCCtext_head : 'v:folddashes'
 
 
-"foldtextの後ろに表示される内容
+"foldheadの後ろに表示される内容
 "評価されるので文字列を指定したい場合は'"文字列"'という形などにする
 let g:foldCCtext_tail =
   \ exists('g:foldCCtext_tail') ? g:foldCCtext_tail :
   \ 'printf("   %s[%4d lines  Lv%-2d]%s",'.
   \ ' v:folddashes, v:foldend-v:foldstart+1, v:foldlevel, v:folddashes)'
+
+
+"foldが深いとき、自動で'foldcolumn'の値を調整する機能を使うかどうか
+let g:foldCCtext_enable_autofdc_adjuster =
+  \ exists('g:foldCCtext_enable_autofdc_adjuster') ? g:foldCCtext_enable_autofdc_adjuster : 0
 
 
 "折畳表示が長すぎるときこの値で切り詰め（既定:60）
@@ -35,13 +40,16 @@ let g:foldCCnavi_maxchars =
 "=============================================================================
 "USAGE: :set foldtext=FoldCCtext()
 function! FoldCCtext() "{{{
+  if g:foldCCtext_enable_autofdc_adjuster && v:foldlevel > &fdc-1
+    call setwinvar(0, '&fdc', v:foldlevel+1)
+  endif
   let foldhead = foldCC#__remove_commentstring_and_foldmarkers(getline(v:foldstart))
   let head = g:foldCCtext_head == '' ? '' : eval(g:foldCCtext_head)
   let tail = g:foldCCtext_tail == '' ? '' : eval(g:foldCCtext_tail)
 
   let truncate_num = s:__get_truncate_num(foldhead, head, tail)
   let foldhead = printf('%-'. truncate_num. '.'. truncate_num. 's', foldhead)
-  let foldhead = s:VLSt.remove_multibyte_garbage(foldhead)
+  let foldhead = s:LSt.remove_multibyte_garbage(foldhead)
   let foldhead = substitute(foldhead, '\^I', '	', 'g')
   let foldhead = substitute(foldhead, '^\s*\ze\S\|^', '\0'. head, '')
 
