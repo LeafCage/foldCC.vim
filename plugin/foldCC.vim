@@ -16,7 +16,7 @@ endfunction
 "=============================================================================
 "NOTE: 互換性のため残してある。
 "      foldCC#navilist()を使うこと。
-"USAGE: :set foldtext=foldCC#navilist()
+"USAGE: :echo foldCC#navilist()
 function! FoldCCnavi() "{{{
   return foldCC#navilist()
 endfunction "}}}
