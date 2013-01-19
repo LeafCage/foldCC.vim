@@ -15,10 +15,10 @@ endfunction
 
 "=============================================================================
 "NOTE: 互換性のため残してある。
-"      foldCC#navilist()を使うこと。
-"USAGE: :echo foldCC#navilist()
+"      foldCC#navi()を使うこと。
+"USAGE: :echo foldCC#navi()
 function! FoldCCnavi() "{{{
-  return foldCC#navilist()
+  return foldCC#navi()
 endfunction "}}}
 
 

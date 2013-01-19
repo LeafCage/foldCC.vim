@@ -36,11 +36,11 @@ let s:V = vital#of('foldCC')
 let s:VLSt = s:V.import('Lclib.String')
 
 "USAGE: :set foldtext=foldCC#foldtext()
-function! foldCC#foldtext()
+function! foldCC#foldtext() "{{{
   if g:foldCCtext_enable_autofdc_adjuster && v:foldlevel > &fdc-1
     call setwinvar(0, '&fdc', v:foldlevel+1)
   endif
-  let foldhead = foldCC#__remove_commentstring_and_foldmarkers(getline(v:foldstart))
+  let foldhead = s:_remove_commentstring_and_foldmarkers(getline(v:foldstart))
   let head = g:foldCCtext_head == '' ? '' : eval(g:foldCCtext_head)
   let tail = g:foldCCtext_tail == '' ? '' : eval(g:foldCCtext_tail)
 
@@ -51,10 +51,10 @@ function! foldCC#foldtext()
   let foldhead = substitute(foldhead, '^\s*\ze\S\|^', '\0'. head, '')
 
   return foldhead. tail
-endfunction "}}}
+endfunction
+"}}}
 
-
-"=============================================================================
+"-----------------------------------------------------------------------------
 function! s:__get_truncate_num(str, head, tail) "{{{
   let col_len = winwidth(0) - &foldcolumn
   if &number
@@ -72,37 +72,18 @@ endfunction "}}}
 
 
 "=============================================================================
-"USAGE: :echo foldCC#navilist()
-function! foldCC#navilist() "{{{
+"USAGE: :echo foldCC#navi()
+function! foldCC#navi() "{{{
   "wrk; 現在行の折り畳みナビゲート文字列を返す
-  let foldheads = s:get_navilist()
+  let foldheads = foldCC#ret_navilist()
   if empty(foldheads)
     return ''
   endif
   return join(foldheads, ' > ')
 endfunction "}}}
 
-
-"=============================================================================
-function! foldCC#__remove_commentstring_and_foldmarkers(str) "{{{
-  let cmss = split(&cms, '%s')
-  if &cms =~? '^%s' "コメント文字が定義されてない時の対応
-    call insert(cmss,'')
-  endif
-  let cmss[0] = substitute(cmss[0],'\s','','g') "コメント文字に空白文字が含まれているときの対応
-
-  let cms_end =''
-  if len(cmss) > 1
-    let cms_end = cmss[1]
-  endif
-  let foldmarkers = split(&foldmarker, ',')
-
-  return substitute(a:str,'\V\%('.cmss[0].'\)\?\s\*'.foldmarkers[0].'\%(\d\+\)\?\s\*\%('.cms_end.'\)\?', '','')
-endfunction "}}}
-
-
-"=============================================================================
-function! s:get_navilist() "{{{
+"-----------------------------------------------------------------------------
+function! foldCC#ret_navilist() "{{{
   let foldheads = []
   if !foldlevel('.') "折り畳みにいない
     return foldheads
@@ -120,7 +101,7 @@ function! s:get_navilist() "{{{
   return foldheads
 endfunction
 "}}}
-
+"--------------------------------------
 function! s:__cv_add_crr_closedfoldhead(foldheads) "{{{
   let foldc_num = foldclosed('.')
   if foldc_num == -1
@@ -167,13 +148,31 @@ endfunction
 "}}}
 
 function! s:___surgery_line(str) "{{{
-  let foldhead = foldCC#__remove_commentstring_and_foldmarkers(a:str)
+  let foldhead = s:_remove_commentstring_and_foldmarkers(a:str)
   let foldhead = substitute(substitute(foldhead, '^\s*\|\s$', '', 'g'), '\s\+', ' ', 'g')
 
   let multibyte_width_diff = len(foldhead) - strdisplaywidth(foldhead)
   let truncate_num = g:foldCCnavi_maxchars + multibyte_width_diff
   return s:VLSt.remove_multibyte_garbage(foldhead[:truncate_num])
   "return s:VLSt.remove_multibyte_garbage(printf('%.'.alignment.'s', foldhead) ) "違いは長い折り畳みの時末尾が表示されるか中央部が表示されるか
+endfunction "}}}
+
+
+"=============================================================================
+function! s:_remove_commentstring_and_foldmarkers(str) "{{{
+  let cmss = split(&cms, '%s')
+  if &cms =~? '^%s' "コメント文字が定義されてない時の対応
+    call insert(cmss,'')
+  endif
+  let cmss[0] = substitute(cmss[0],'\s','','g') "コメント文字に空白文字が含まれているときの対応
+
+  let cms_end =''
+  if len(cmss) > 1
+    let cms_end = cmss[1]
+  endif
+  let foldmarkers = split(&foldmarker, ',')
+
+  return substitute(a:str,'\V\%('.cmss[0].'\)\?\s\*'.foldmarkers[0].'\%(\d\+\)\?\s\*\%('.cms_end.'\)\?', '','')
 endfunction "}}}
 "=============================================================================
 let &cpo = s:save_cpo| unlet s:save_cpo
