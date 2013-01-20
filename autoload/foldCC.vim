@@ -10,7 +10,7 @@ let g:foldCCtext_maxchars =
 "foldheadの前に表示される内容
 "評価されるので文字列を指定したい場合は'"文字列"'という形などにする
 let g:foldCCtext_head =
-  \ exists('g:foldCCtext_head') ? g:foldCCtext_head : 'v:folddashes'
+  \ exists('g:foldCCtext_head') ? g:foldCCtext_head : 'v:folddashes. " "'
 
 
 "foldheadの後ろに表示される内容
