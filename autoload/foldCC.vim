@@ -42,7 +42,7 @@ function! foldCC#foldtext() "{{{
   endif
   let foldhead = s:_remove_commentstring_and_foldmarkers(getline(v:foldstart))
   let head = g:foldCCtext_head == '' ? '' : eval(g:foldCCtext_head)
-  let tail = g:foldCCtext_tail == '' ? '' : eval(g:foldCCtext_tail)
+  let tail = g:foldCCtext_tail == '' ? '' : ' '. eval(g:foldCCtext_tail)
 
   let truncate_num = s:__get_truncate_num(foldhead, head, tail)
   let foldhead = printf('%-'. truncate_num. '.'. truncate_num. 's', foldhead)
