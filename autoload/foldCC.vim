@@ -45,7 +45,7 @@ function! foldCC#foldtext() "{{{
   let tail = g:foldCCtext_tail == '' ? '' : ' '. eval(g:foldCCtext_tail)
 
   let truncate_num = s:__get_truncate_num(foldhead, head, tail)
-  let foldhead = printf('%-'. truncate_num. '.'. truncate_num. 's', foldhead)
+  let foldhead = printf('%-*.*s', truncate_num, truncate_num, foldhead)
   let foldhead = s:VLSt.remove_multibyte_garbage(foldhead)
   let foldhead = substitute(foldhead, '\^I', '	', 'g')
   let foldhead = substitute(foldhead, '^\s*\ze\S\|^', '\0'. head, '')
