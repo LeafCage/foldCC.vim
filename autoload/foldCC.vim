@@ -79,6 +79,9 @@ function! foldCC#navi() "{{{
   if empty(foldheads)
     return ''
   endif
+  if has('gui_macvim')
+      redraw
+  endif
   return join(foldheads, ' > ')
 endfunction "}}}
 
