@@ -4,9 +4,7 @@ scriptencoding utf-8
 "=============================================================================
 let g:foldCCtext_maxchars = get(g:, 'foldCCtext_maxchars', 78)
 let g:foldCCtext_head = get(g:, 'foldCCtext_head', 'v:folddashes. " "')
-let g:foldCCtext_tail = get(g:, 'foldCCtext_tail',
-  \ 'printf("   %s[%4d lines  Lv%-2d]%s", v:folddashes, v:foldend-v:foldstart+1, v:foldlevel, v:folddashes)'
-  \ )
+let g:foldCCtext_tail = get(g:, 'foldCCtext_tail', 'v:foldend - v:foldstart+1')
 let g:foldCCtext_enable_autofdc_adjuster = get(g:, 'foldCCtext_enable_autofdc_adjuster', 0)
 let g:foldCCnavi_maxchars = get(g:, 'foldCCnavi_maxchars', 60)
 

@@ -74,11 +74,13 @@ g:foldCCtext_head				*g:foldCCtext_head*
 
 
 g:foldCCtext_tail				*g:foldCCtext_tail*
-	既定値:  'printf("   %s[%4d lines  Lv%-2d]%s",
-		\ v:folddashes, v:foldend-v:foldstart+1, v:foldlevel, v:folddashes)'
+	既定値:  'v:foldend - v:foldstart+1'
 	|FoldCCtext()|で利用される。
 	foldtext の後方に挿入される内容。
 	評価されるので文字列を指定したい場合は '"文字列"' という形などにする。
+	以前の既定値を使いたければ、以下のようにする。 >
+	  let g:foldCCtext_tail = 'printf("   %s[%4d lines  Lv%-2d]%s",
+	  \ v:folddashes, v:foldend-v:foldstart+1, v:foldlevel, v:folddashes)'
 
 
 g:foldCCtext_enable_autofdc_adjuster	*g:foldCCtext_enable_autofdc_adjuster*
