@@ -67,12 +67,23 @@ endfunction
 function! s:_adjust_headline(headline, reducelen) "{{{
   let headline = s:_remove_commentstring_and_foldmarkers(a:headline)
   let colwidth = s:_get_colwidth()
-  let colwidth = colwidth > g:foldCCtext_maxchars ? g:foldCCtext_maxchars : colwidth
-  let multibyte_widthgap = strlen(headline) - strdisplaywidth(headline)
-  let headlinewidth = colwidth - a:reducelen + multibyte_widthgap
-  let headline = printf('%-*.*s', headlinewidth, headlinewidth, headline)
-  return s:_remove_multibyte_garbage(headline)
-  "Issue: multibyte_widthgapで足される分が多い (61桁をオーバーして切り詰められてる場合
+  let truncatelen = (colwidth < g:foldCCtext_maxchars ? colwidth : g:foldCCtext_maxchars) - a:reducelen
+  let dispwidth = strdisplaywidth(headline)
+  if dispwidth < truncatelen
+    let multibyte_widthgap = strlen(headline) - dispwidth
+    let headlinewidth = truncatelen + multibyte_widthgap
+    return printf('%-*s', headlinewidth, headline)
+  end
+  let ret = ''
+  let len = 0
+  for char in split(headline, '\zs')
+    let len += strdisplaywidth(char)
+    if len > truncatelen
+      break
+    end
+    let ret .= char
+  endfor
+  return strdisplaywidth(ret)==truncatelen ? ret : ret.' '
 endfunction
 "}}}
 
@@ -87,8 +98,8 @@ function! s:FoldGatherer._register_headline(headline) "{{{
   let headline = s:_remove_commentstring_and_foldmarkers(a:headline)
   let headline = substitute(substitute(line, '^\s*\|\s$', '', 'g'), '\s\+', ' ', 'g')
   let multibyte_widthgap = len(headline) - strdisplaywidth(headline)
-  let truncate_width = g:foldCCnavi_maxchars + multibyte_widthgap
-  let headline = s:_remove_multibyte_garbage(headline[:truncate_width])
+  let truncatelen = g:foldCCnavi_maxchars + multibyte_widthgap
+  let headline = s:_remove_multibyte_garbage(headline[:truncatelen])
   call insert(self.headlines, headline)
 endfunction
 "}}}
