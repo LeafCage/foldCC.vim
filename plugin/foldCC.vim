@@ -24,12 +24,13 @@ endfunction
 "}}}
 
 function! FoldCCnavi() "{{{
-  let foldheads = foldCCnavi_get_headlines()
+  let foldheads = FoldCCnavi_get_headlines()
   if empty(foldheads)
     return ''
   endif
   return join(foldheads, ' > ')
-endfunction "}}}
+endfunction
+"}}}
 function! FoldCCnavi_get_headlines() "{{{
   if !foldlevel('.')
     return []
