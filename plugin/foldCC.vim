@@ -42,7 +42,7 @@ function! FoldCCnavi_get_headlines() "{{{
     return gatherer.get_headlines()
   finally
     call winrestview(save_view)
-  end
+  endtry
 endfunction
 "}}}
 
@@ -95,7 +95,7 @@ endfunction
 "}}}
 function! s:FoldGatherer._register_headline(headline) "{{{
   let headline = s:_remove_commentstring_and_foldmarkers(a:headline)
-  let headline = substitute(substitute(line, '^\s*\|\s$', '', 'g'), '\s\+', ' ', 'g')
+  let headline = substitute(substitute(headline, '^\s*\|\s$', '', 'g'), '\s\+', ' ', 'g')
   let multibyte_widthgap = len(headline) - strdisplaywidth(headline)
   let truncatelen = g:foldCCnavi_maxchars + multibyte_widthgap
   let headline = s:_remove_multibyte_garbage(headline[:truncatelen])
