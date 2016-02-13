@@ -56,7 +56,7 @@ function! s:_remove_commentstring_and_foldmarkers(str) "{{{
   return substitute(a:str, '\%('.cmsbgn.'\)\?\s*'.foldmarkers[0].'\%(\d\+\)\?\s*\%('.cmsend.'\)\?', '','')
 endfunction "}}}
 function! s:_get_colwidth() "{{{
-  return winwidth(0) - &foldcolumn - (!&number ? 0 : max([&numberwidth, len(line('$'))]))
+  return winwidth(0) - &foldcolumn - (!&number ? 0 : max([&numberwidth, len(line('$'))])) - 1
 endfunction
 "}}}
 function! s:_remove_multibyte_garbage(str) "{{{
