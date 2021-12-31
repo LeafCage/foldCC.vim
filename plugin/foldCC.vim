@@ -8,6 +8,7 @@ let g:foldCCtext_tail = get(g:, 'foldCCtext_tail', 'v:foldend - v:foldstart+1')
 let g:foldCCtext_enable_autofdc_adjuster = get(g:, 'foldCCtext_enable_autofdc_adjuster', 0)
 let g:foldCCnavi_maxchars = get(g:, 'foldCCnavi_maxchars', 60)
 
+command! FoldccNavi   echo FoldCCnavi()
 
 "=============================================================================
 "Main:
